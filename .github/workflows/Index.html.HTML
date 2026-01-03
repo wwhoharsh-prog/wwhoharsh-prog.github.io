@@ -1,0 +1,783 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Special Note For You</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    
+    <!-- Custom Styles for fonts, animations, and 3D card flip -->
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            /* Gradient background similar to the video */
+            background: linear-gradient(170deg, #fee2e2, #fff1f2, #fdf2f8);
+        }
+
+        /* Special heading font */
+        .font-cursive {
+            font-family: 'Pacifico', cursive;
+        }
+
+        /* --- Background Animation --- */
+        /* Container for floating items */
+        .floating-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Individual floating item */
+        .floating-item {
+            position: absolute;
+            animation: floatUp 15s linear infinite;
+            opacity: 0.7;
+            font-size: 1.5rem; /* 24px */
+        }
+
+        /* Keyframes for floating animation */
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-10vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* --- Screen Transition --- */
+        .screen {
+            /* All screens are hidden by default */
+            display: none;
+            /* Ensures they take up full height and have flex for centering */
+            min-height: 100vh;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        /* Utility class to show the current screen */
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        /* --- Letter Animation --- */
+        .envelope {
+            position: relative;
+            width: 280px;
+            height: 180px;
+            background-color: #f8bbd0; /* pink-200 */
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f48fb1; /* pink-300 */
+            border-radius: 8px;
+            transform-origin: top;
+            transition: transform 0.5s ease-in-out;
+            clip-path: polygon(0 0, 100% 0, 100% 50%, 50% 100%, 0 50%);
+        }
+        .letter {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 260px;
+            height: 160px;
+            background-color: white;
+            border-radius: 6px;
+            transition: all 0.5s ease-in-out 0.2s;
+            transform: translateY(100%);
+            opacity: 0;
+            padding: 20px;
+            font-size: 0.8rem;
+            color: #555;
+            z-index: -1;
+        }
+        /* State for unfolded letter */
+        .unfolded .envelope-flap {
+            transform: rotateX(180deg);
+        }
+        .unfolded .letter {
+            transform: translateY(0);
+            opacity: 1;
+            z-index: 1;
+        }
+        
+        /* --- Playlist Carousel --- */
+        .song-card {
+            display: none; /* Hide all by default */
+        }
+        .song-card.active {
+            display: block; /* Show active one */
+        }
+
+        /* --- Flip Card Game --- */
+        .flip-card {
+            background-color: transparent;
+            width: 100px;
+            height: 140px;
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flip-card.is-flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .flip-card-front {
+            background: linear-gradient(135deg, #fbcfe8, #f472b6);
+            color: white;
+        }
+        .flip-card-back {
+            background: white;
+            color: #f472b6;
+            transform: rotateY(180deg);
+        }
+        
+        /* --- Final Sealing Animation --- */
+        @keyframes sealAnimation {
+            0% { transform: translateY(0) rotate(0); }
+            20% { transform: translateY(-10px) rotate(-5deg); }
+            80% { transform: translateY(80px) rotate(5deg); opacity: 1; }
+            100% { transform: translateY(100px) rotate(0); opacity: 0; }
+        }
+        .seal-animate {
+            animation: sealAnimation 2s ease-in-out forwards;
+        }
+
+        /* --- Virtual Kiss Animation --- */
+        @keyframes kissPop {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes kissFade {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-50px) scale(0.8); }
+        }
+        .kiss-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 10rem;
+            z-index: 100;
+            pointer-events: none;
+            animation: kissPop 0.3s ease-out, kissFade 0.5s ease-in 1s forwards;
+        }
+
+    </style>
+</head>
+<body class="bg-pink-50 text-gray-700">
+
+    <!-- 
+      This is the main container, centered and styled to look like the app on the phone.
+      We use max-w-md for a phone-like width and mx-auto to center it.
+      overflow-hidden and relative are needed for the floating hearts.
+    -->
+    <main class="max-w-md mx-auto relative overflow-hidden shadow-2xl rounded-lg bg-gradient-to-b from-pink-100 to-rose-100" style="min-height: 100vh;">
+        <!-- Container for floating hearts. It sits behind all content. -->
+        <div id="floating-container" class="floating-container"></div>
+
+        <!-- 
+          Each "screen" of the app is a div with class "screen".
+          Only one screen with class "active" will be visible at a time.
+          'z-10' ensures content is above the floating hearts background.
+        -->
+
+        <!-- Screen 1: Intro -->
+        <div id="screen-intro" class="screen active z-10 flex-col justify-between items-center p-8 text-center">
+            <!-- Content for Intro -->
+            <div class="w-full">
+                <div class="mt-12">
+                    <span class="text-6xl">💖</span>
+                    <h2 class="text-2xl font-bold text-pink-500 mt-4">A Note For You!</h2>
+                </div>
+                
+                <div class="mt-12">
+                    <h1 class="text-4xl font-cursive text-pink-600">Hey Princess!</h1>
+                    <p class="mt-4 text-lg text-gray-600">
+                        I wanted to do something special for you, for this princess day, so I made something special just for you...
+                    </p>
+                    <p class="mt-4 text-lg text-gray-600">
+                        Click below to see what it is!
+                    </p>
+                </div>
+            </div>
+
+            <!-- Footer / Action Button -->
+            <div class="w-full mb-8">
+                <button id="btn-open-heart" class="w-full bg-pink-500 text-white font-bold py-4 px-6 rounded-full shadow-lg text-lg transform transition-transform hover:scale-105 duration-200">
+                    Open My Heart ❤️
+                </button>
+                <p class="mt-4 text-sm text-pink-400">Made with love only for you</p>
+                <p class="mt-4 text-sm text-pink-400">Made by hardhvardhan</p>
+                <a href="https://www.instagram.com/WWHOHARSH_/" target="_blank" rel="noopener noreferrer" class="mt-1 text-xs text-pink-400 hover:text-pink-500 underline">
+                    @wwhoharsh_
+                </a>
+            </div>
+        </div>
+        
+        <!-- Screen 2: Love Letter -->
+        <div id="screen-letter" class="screen z-10 flex-col justify-center items-center p-8 text-center">
+            <h2 class="text-4xl font-cursive text-pink-600">A Love Letter</h2>
+            <p class="text-lg text-gray-500 mb-8">From my heart to yours</p>
+            
+            <!-- Envelope Animation -->
+            <div id="envelope" class="envelope">
+                <div class="envelope-flap"></div>
+                <div class="letter">
+                    <p class="font-bold">My Dearest,</p>
+                    <p>This is just the start...</p>
+                    <p>Get ready for what's next!</p>
+                    <p class="text-right mt-4">💖</p>
+                </div>
+            </div>
+            <p class="mt-4 text-gray-500 text-sm">Tap the letter to open!</p>
+        </div>
+
+        <!-- Screen 3: Playlist -->
+        <div id="screen-playlist" class="screen z-10 flex-col justify-between items-center p-8 text-center">
+            <!-- Header -->
+            <div class="w-full">
+                <h2 class="text-3xl font-cursive text-pink-600">A Dedicated Playlist</h2>
+                <p class="text-lg text-gray-500">I Hope You'll Like It</p>
+            </div>
+            
+            <!-- Carousel Container -->
+            <div class="w-full my-6">
+                <!-- Song 1 -->
+                <div id="song-1" class="song-card active bg-white rounded-2xl shadow-xl p-6">
+                    <img src="https://placehold.co/300x300/fbcfe8/f472b6?text=Spidey+%26+Kitty" alt="Album Art 1" class="w-full rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold mt-4 text-pink-600">Dil Cheeze Tujhe Dedi</h3>
+                    <p class="text-gray-500">You own this heart - dedicated to you</p>
+                    <div class="w-full h-2 bg-gray-200 rounded-full mt-4 overflow-hidden">
+                        <div class="w-1/4 h-full bg-pink-500"></div>
+                    </div>
+                    <div class="flex justify-center items-center mt-4">
+                        <span class="text-sm text-gray-500">0:04</span>
+                        <button class="mx-6 text-pink-500 text-4xl">
+                            <!-- Play Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>
+                        </button>
+                        <span class="text-sm text-gray-500">0:17</span>
+                    </div>
+                </div>
+                <!-- Song 2 -->
+                <div id="song-2" class="song-card bg-white rounded-2xl shadow-xl p-6">
+                    <img src="https://placehold.co/300x300/fecaca/ef4444?text=If+The+World" alt="Album Art 2" class="w-full rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold mt-4 text-red-600">If the world was ending</h3>
+                    <p class="text-gray-500">Even if the world ends, I'd still find you</p>
+                    <div class="w-full h-2 bg-gray-200 rounded-full mt-4 overflow-hidden">
+                        <div class="w-1/5 h-full bg-red-500"></div>
+                    </div>
+                    <div class="flex justify-center items-center mt-4">
+                        <span class="text-sm text-gray-500">0:07</span>
+                        <button class="mx-6 text-red-500 text-4xl">
+                            <!-- Play Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>
+                        </button>
+                        <span class="text-sm text-gray-500">0:33</span>
+                    </div>
+                </div>
+                <!-- Song 3 -->
+                <div id="song-3" class="song-card bg-white rounded-2xl shadow-xl p-6">
+                    <img src="https://placehold.co/300x300/bae6fd/0ea5e9?text=Dil+Ka" alt="Album Art 3" class="w-full rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold mt-4 text-cyan-600">Dil Ka...</h3>
+                    <p class="text-gray-500">Tu Kaare Dil Bekarar</p>
+                    <div class="w-full h-2 bg-gray-200 rounded-full mt-4 overflow-hidden">
+                        <div class="w-1/2 h-full bg-cyan-500"></div>
+                    </div>
+                    <div class="flex justify-center items-center mt-4">
+                        <span class="text-sm text-gray-500">0:12</span>
+                        <button class="mx-6 text-cyan-500 text-4xl">
+                            <!-- Play Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>
+                        </button>
+                        <span class="text-sm text-gray-500">0:24</span>
+                    </div>
+                </div>
+
+                <!-- Carousel Controls -->
+                <div class="flex justify-between w-full mt-4">
+                    <button id="btn-prev-song" class="text-pink-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <button id="btn-next-song" class="text-pink-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Footer / Action Button -->
+            <div class="w-full mb-8">
+                <button id="btn-continue-playlist" class="w-full bg-pink-500 text-white font-bold py-4 px-6 rounded-full shadow-lg text-lg transform transition-transform hover:scale-105 duration-200">
+                    Continue to Next ✨
+                </button>
+            </div>
+        </div>
+        
+        <!-- Screen 4: Cards -->
+        <div id="screen-cards" class="screen z-10 flex-col justify-between items-center p-8 text-center">
+            <!-- Header -->
+            <div class="w-full">
+                <h2 class="text-3xl font-cursive text-pink-600">Some Special Cards</h2>
+                <p class="text-lg text-gray-500">Click each card to reveal a special message!</p>
+            </div>
+            
+            <!-- Card Grid -->
+            <div class="flex justify-around w-full my-8">
+                <!-- Card 1 -->
+                <div class="flip-card" data-card="1">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <span class="text-5xl">🐱</span>
+                            <p class="font-bold mt-2">Tap Me!</p>
+                        </div>
+                        <div class="flip-card-back p-2">
+                            <img src="https://placehold.co/100x70/fbcfe8/f472b6?text=Love+You" alt="Card Art" class="rounded-md">
+                            <p class="font-bold text-sm mt-1">I Love U Always 💖</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="flip-card" data-card="2">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <span class="text-5xl">🕷️</span>
+                            <p class="font-bold mt-2">Tap Me!</p>
+                        </div>
+                        <div class="flip-card-back p-2">
+                            <img src="https://placehold.co/100x70/fbcfe8/f472b6?text=My+World" alt="Card Art" class="rounded-md">
+                            <p class="font-bold text-sm mt-1">You are my world 🌍</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="flip-card" data-card="3">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <span class="text-5xl">💌</span>
+                            <p class="font-bold mt-2">Tap Me!</p>
+                        </div>
+                        <div class="flip-card-back p-2">
+                            <img src="https://placehold.co/100x70/fbcfe8/f472b6?text=Forever" alt="Card Art" class="rounded-md">
+                            <p class="font-bold text-sm mt-1">You & Me Forever ♾️</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer / Progress -->
+            <div class="w-full mb-8">
+                <p id="card-progress" class="text-lg text-gray-600 font-bold">
+                    0 of 3 messages discovered!
+                </p>
+                <p class="mt-2 text-sm text-gray-500">Keep exploring ✨</p>
+            </div>
+        </div>
+
+        <!-- Screen 5: Final Letter -->
+        <div id="screen-final-letter" class="screen z-10 flex-col justify-between items-center p-8 text-center">
+            <!-- Header -->
+            <div class="w-full">
+                <span class="text-6xl">🐱</span>
+                <h2 class="text-3xl font-cursive text-pink-600 mt-2">My Sweetest Cutiepie,</h2>
+            </div>
+            
+            <!-- Letter Content -->
+            <div class="my-6 bg-white/70 backdrop-blur-sm rounded-lg p-4 shadow-inner text-left text-gray-700">
+                <p>You're the calm I reach for and the laugh that brightens my day.</p>
+                <br>
+                <p>I hope this tiny world made you smile - and remember how much you mean to me.</p>
+                <br>
+                <p>I'll keep making memories, big and small, always with you.</p>
+                <br>
+                <p class="font-bold">Forever yours, in every little universe.</p>
+            </div>
+
+            <!-- Footer / Action Buttons -->
+            <div class="w-full mb-8 space-y-4">
+                <button id="btn-seal-letter" class="w-full bg-pink-500 text-white font-bold py-4 px-6 rounded-full shadow-lg text-lg transform transition-transform hover:scale-105 duration-200">
+                    Seal this Letter 💌
+                </button>
+                <button id="btn-restart" class="w-full bg-gray-300 text-gray-700 font-bold py-3 px-6 rounded-full shadow-md text-md transform transition-transform hover:scale-105 duration-200">
+                    Restart
+                </button>
+            </div>
+        </div>
+
+        <!-- Screen 6: Sealing Animation -->
+        <div id="screen-sealing" class="screen z-10 flex-col justify-center items-center p-8 text-center">
+            <div id="sealing-envelope" class="relative">
+                <span class="text-8xl">💌</span>
+                <span class="text-5xl absolute -top-4 -right-4 seal-animate">💖</span>
+            </div>
+            <h2 class="text-2xl font-bold text-pink-500 mt-8">Sealing your letter...</h2>
+            <p class="text-lg text-gray-500">With all my love.</p>
+        </div>
+
+        <!-- Screen 7: Sealed -->
+        <div id="screen-sealed" class="screen z-10 flex-col justify-between items-center p-8 text-center">
+            <!-- Header -->
+            <div class="w-full">
+                <span class="text-8xl">💌</span>
+                <h2 class="text-2xl font-bold text-pink-500 mt-4">Letter Sealed with Love</h2>
+                <p class="text-xl font-cursive text-pink-600 mt-2">I Love You Always</p>
+                
+                <div class="flex justify-center space-x-2 mt-4 text-4xl text-pink-200">
+                    <span>♡</span><span>♡</span><span>♡</span><span>♡</span><span>♡</span>
+                </div>
+            </div>
+            
+            <!-- Signature -->
+            <div class="my-6">
+                <h3 class="text-4xl font-cursive text-pink-600">Always Yours ✨</h3>
+                <p id="final-date" class="text-lg text-gray-500 mt-2">
+                    <!-- Date will be inserted by JS -->
+                </p>
+            </div>
+
+            <!-- Footer / Action Buttons -->
+            <div class="w-full mb-8 space-y-4">
+                <button id="btn-experience-again" class="w-full bg-pink-500 text-white font-bold py-4 px-6 rounded-full shadow-lg text-lg transform transition-transform hover:scale-105 duration-200">
+                    Experience Again ✨
+                </button>
+                <button id="btn-virtual-kiss" class="w-full bg-green-400 text-white font-bold py-3 px-6 rounded-full shadow-md text-md transform transition-transform hover:scale-105 duration-200">
+                    Send a Virtual Kiss 💋
+                </button>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Modal: All Messages Unlocked -->
+    <div id="modal-unlocked" class="hidden fixed inset-0 bg-black/50 z-50 flex justify-center items-center p-8">
+        <div class="bg-white rounded-2xl shadow-xl p-8 text-center max-w-sm w-full">
+            <h2 class="text-2xl font-bold text-pink-600">All Messages Unlocked!</h2>
+            <p class="text-gray-600 mt-4">
+                Each message is a piece of my heart that belongs to you forever.
+            </p>
+            <button id="btn-open-final-letter" class="w-full mt-6 bg-pink-500 text-white font-bold py-3 px-6 rounded-full shadow-lg text-lg">
+                Open the Final Letter 💌
+            </button>
+            <button id="btn-stay-longer" class="mt-2 text-sm text-gray-500">
+                Stay here a bit longer
+            </button>
+        </div>
+    </div>
+
+
+    <!-- JavaScript Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- State Management ---
+            // A set to keep track of which cards have been flipped
+            const flippedCards = new Set();
+            // Total number of songs in the playlist
+            const totalSongs = 3;
+            // Current song index (1-based)
+            let currentSongIndex = 1;
+            // A variable to hold the timeout for the letter animation
+            let letterTimeout;
+
+            // --- Element References ---
+            const screens = document.querySelectorAll('.screen');
+            const floatingContainer = document.getElementById('floating-container');
+            
+            // Screen 1 (Intro)
+            const btnOpenHeart = document.getElementById('btn-open-heart');
+            
+            // Screen 2 (Letter)
+            const envelope = document.getElementById('envelope');
+            
+            // Screen 3 (Playlist)
+            const btnContinuePlaylist = document.getElementById('btn-continue-playlist');
+            const btnPrevSong = document.getElementById('btn-prev-song');
+            const btnNextSong = document.getElementById('btn-next-song');
+            
+            // Screen 4 (Cards)
+            const flipCards = document.querySelectorAll('.flip-card');
+            const cardProgress = document.getElementById('card-progress');
+            const modalUnlocked = document.getElementById('modal-unlocked');
+            const btnOpenFinalLetter = document.getElementById('btn-open-final-letter');
+            const btnStayLonger = document.getElementById('btn-stay-longer');
+            
+            // Screen 5 (Final Letter)
+            const btnSealLetter = document.getElementById('btn-seal-letter');
+            const btnRestart = document.getElementById('btn-restart');
+            
+            // Screen 6 (Sealing)
+            const sealingEnvelope = document.getElementById('sealing-envelope');
+            
+            // Screen 7 (Sealed)
+            const finalDate = document.getElementById('final-date');
+            const btnExperienceAgain = document.getElementById('btn-experience-again');
+            const btnVirtualKiss = document.getElementById('btn-virtual-kiss');
+
+            // --- Helper Functions ---
+
+            /**
+             * Shows a specific screen by ID and hides all others.
+             * @param {string} screenId The ID of the screen to show (e.g., 'screen-intro')
+             */
+            function showScreen(screenId) {
+                // Hide all screens
+                screens.forEach(screen => screen.classList.remove('active'));
+                
+                // Show the target screen
+                const activeScreen = document.getElementById(screenId);
+                if (activeScreen) {
+                    activeScreen.classList.add('active');
+                }
+            }
+
+            /**
+             * Resets the entire experience to the beginning.
+             */
+            function resetExperience() {
+                // Reset card game
+                flippedCards.clear();
+                flipCards.forEach(card => card.classList.remove('is-flipped'));
+                cardProgress.textContent = '0 of 3 messages discovered!';
+                modalUnlocked.classList.add('hidden');
+                
+                // Reset playlist
+                currentSongIndex = 1;
+                updatePlaylistView();
+                
+                // Reset letter animation
+                envelope.classList.remove('unfolded');
+                if (letterTimeout) clearTimeout(letterTimeout);
+                
+                // Go to intro screen
+                showScreen('screen-intro');
+            }
+
+            // --- Background Animation ---
+            /**
+             * Creates a floating heart or star and adds it to the container.
+             */
+            function createFloatingItem() {
+                if (document.hidden) return; // Don't run if tab is not active
+                
+                const item = document.createElement('span');
+                item.classList.add('floating-item');
+                
+                // Randomly choose an emoji
+                const emojis = ['💖', '✨', '❤️', '💕', '🌟'];
+                item.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+                
+                // Randomize horizontal position, size, and animation duration
+                item.style.left = `${Math.random() * 100}vw`;
+                item.style.fontSize = `${Math.random() * 1 + 0.5}rem`; // 0.5rem to 1.5rem
+                item.style.animationDuration = `${Math.random() * 10 + 10}s`; // 10s to 20s
+                
+                floatingContainer.appendChild(item);
+                
+                // Remove the item after its animation completes
+                item.addEventListener('animationend', () => {
+                    item.remove();
+                });
+            }
+            // Create a new item every 1.5 seconds
+            setInterval(createFloatingItem, 1500);
+
+            // --- Screen 1: Intro ---
+            btnOpenHeart.addEventListener('click', () => {
+                showScreen('screen-letter');
+                // Trigger the letter animation automatically after a short delay
+                letterTimeout = setTimeout(() => {
+                    envelope.classList.add('unfolded');
+                    // Add another timeout to move to the next screen after unfolding
+                    letterTimeout = setTimeout(() => {
+                        showScreen('screen-playlist');
+                    }, 2000); // Wait 2s after unfolding
+                }, 500); // Wait 0.5s before unfolding
+            });
+            
+            // --- Screen 2: Letter ---
+            // Also allow manual tap to speed up
+            envelope.addEventListener('click', () => {
+                if (envelope.classList.contains('unfolded')) return; // Don't re-trigger
+                
+                if (letterTimeout) clearTimeout(letterTimeout); // Clear scheduled timeouts
+                
+                envelope.classList.add('unfolded');
+                letterTimeout = setTimeout(() => {
+                    showScreen('screen-playlist');
+                }, 1500); // Wait 1.5s after manual tap
+            });
+
+            // --- Screen 3: Playlist ---
+            /**
+             * Updates the carousel to show the current song.
+             */
+            function updatePlaylistView() {
+                // Hide all song cards
+                document.querySelectorAll('.song-card').forEach(card => card.classList.remove('active'));
+                
+                // Show the active song card
+                const activeSong = document.getElementById(`song-${currentSongIndex}`);
+                if (activeSong) {
+                    activeSong.classList.add('active');
+                }
+                
+                // NOTE: Audio playback logic is not implemented
+                // To add audio, you would use:
+                // const audio = new Audio('path/to/song.mp3');
+                // audio.play();
+            }
+
+            btnPrevSong.addEventListener('click', () => {
+                currentSongIndex--;
+                if (currentSongIndex < 1) {
+                    currentSongIndex = totalSongs; // Wrap around to last song
+                }
+                updatePlaylistView();
+            });
+
+            btnNextSong.addEventListener('click', () => {
+                currentSongIndex++;
+                if (currentSongIndex > totalSongs) {
+                    currentSongIndex = 1; // Wrap around to first song
+                }
+                updatePlaylistView();
+            });
+            
+            btnContinuePlaylist.addEventListener('click', () => {
+                showScreen('screen-cards');
+            });
+
+            // --- Screen 4: Cards ---
+            flipCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    // Flip the card
+                    card.classList.add('is-flipped');
+                    
+                    // Add to our set of flipped cards
+                    const cardId = card.dataset.card;
+                    flippedCards.add(cardId);
+                    
+                    // Update progress
+                    cardProgress.textContent = `${flippedCards.size} of 3 messages discovered!`;
+                    
+                    // Check if all cards are flipped
+                    if (flippedCards.size === 3) {
+                        // Wait a moment, then show the modal
+                        setTimeout(() => {
+                            modalUnlocked.classList.remove('hidden');
+                            modalUnlocked.classList.add('flex');
+                        }, 800);
+                    }
+                });
+            });
+
+            btnOpenFinalLetter.addEventListener('click', () => {
+                modalUnlocked.classList.add('hidden');
+                modalUnlocked.classList.remove('flex');
+                showScreen('screen-final-letter');
+            });
+            
+            btnStayLonger.addEventListener('click', () => {
+                modalUnlocked.classList.add('hidden');
+                modalUnlocked.classList.remove('flex');
+                // User stays on the card screen
+            });
+
+            // --- Screen 5: Final Letter ---
+            btnSealLetter.addEventListener('click', () => {
+                showScreen('screen-sealing');
+                
+                // Animate the envelope sealing
+                sealingEnvelope.querySelector('.seal-animate').classList.add('seal-animate');
+                
+                // Wait for animation to finish, then go to final screen
+                setTimeout(() => {
+                    showScreen('screen-sealed');
+                    // Set the date on the final screen
+                    const today = new Date();
+                    // Let's use the exact date from the video for fun: Sunday, November 18, 2025
+                    const videoDate = new Date('2025-11-18T12:00:00');
+                    finalDate.textContent = videoDate.toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                }, 2000); // Match animation duration
+            });
+
+            btnRestart.addEventListener('click', resetExperience);
+
+            // --- Screen 7: Sealed ---
+            btnExperienceAgain.addEventListener('click', resetExperience);
+
+            btnVirtualKiss.addEventListener('click', () => {
+                // Create a kiss emoji
+                const kiss = document.createElement('div');
+                kiss.innerHTML = '💋';
+                kiss.classList.add('kiss-animation');
+                
+                // Add it to the body
+                document.body.appendChild(kiss);
+                
+                // Remove it after the animation ends
+                kiss.addEventListener('animationend', () => {
+                    kiss.remove();
+                });
+            });
+
+            // --- Initial Setup ---
+            // Set the initial screen (intro)
+            showScreen('screen-intro');
+
+        });
+    </script>
+</body>
+</html>
